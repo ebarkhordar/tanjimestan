@@ -15,6 +15,7 @@ from telegram.ext import (
     ConversationHandler,
     CallbackContext,
 )
+from dotenv import dotenv_values, load_dotenv
 
 # Enable logging
 from astronomy import get_moon_txt
@@ -102,6 +103,7 @@ def main() -> None:
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
+    load_dotenv(".env")
     updater = Updater(os.getenv('BOT_TOKEN'), use_context=True)
 
     # Get the dispatcher to register handlers
