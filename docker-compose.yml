@@ -4,6 +4,5 @@ services:
     image: tanjimestan:latest
     container_name: tanjimestan
     restart: always 
-    environment:
-      - BOT_TOKEN=
-      - GROUP_CHAT_ID=
+    env_file:
+      - .env
