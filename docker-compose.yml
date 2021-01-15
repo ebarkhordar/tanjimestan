@@ -5,4 +5,5 @@ services:
     container_name: tanjimestan
     restart: always 
     environment:
-      - BOT_TOKEN
+      - BOT_TOKEN=
+      - GROUP_CHAT_ID=
