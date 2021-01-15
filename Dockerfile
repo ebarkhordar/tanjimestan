@@ -4,6 +4,8 @@ FROM python:3.9.0-slim
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+ENV TZ Asia/Tehran
+
 # set work directory
 RUN mkdir /code
 WORKDIR /code
@@ -15,4 +17,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "daily.py" ]
+CMD [ "python", "main.py" ]
