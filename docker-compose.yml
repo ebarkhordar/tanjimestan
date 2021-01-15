@@ -1,0 +1,8 @@
+version: '3.0'
+services:
+  tanjimestan:
+    image: tanjimestan:0.0.1
+    container_name: tanjimestan
+    restart: always 
+    environment:
+      - BOT_TOKEN
