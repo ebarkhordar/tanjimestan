@@ -9,6 +9,7 @@ from astronomy import get_moon_txt
 
 load_dotenv(".env")
 bot = Bot(os.getenv('BOT_TOKEN'))
+print("schedule started successfully")
 
 
 def job(t):
