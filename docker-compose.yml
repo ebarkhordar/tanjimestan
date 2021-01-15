@@ -1,7 +1,7 @@
 version: '3.0'
 services:
   tanjimestan:
-    image: tanjimestan:0.0.1
+    image: tanjimestan:latest
     container_name: tanjimestan
     restart: always 
     environment:
