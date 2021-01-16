@@ -4,6 +4,9 @@ FROM python:3.9.0-slim
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+RUN apt-get update -y
+RUN apt-get install -y tzdata
+
 ENV TZ Asia/Tehran
 
 # set work directory
