@@ -21,6 +21,7 @@ import logging
 import os
 import datetime
 
+import pytz
 import telegram
 from dotenv import load_dotenv
 from telegram import Update
@@ -76,8 +77,8 @@ def main():
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
-
-    job_minute = updater.job_queue.run_daily(astropy_daily_report, datetime.time(6, 0, 0))
+    tehran_timezone = pytz.timezone("Asia/Tehran")
+    job_minute = updater.job_queue.run_daily(astropy_daily_report, datetime.time(6, 0, 0, tzinfo=tehran_timezone))
     # on noncommand i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
