@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # pylint: disable=W0613, C0116
-# type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -24,7 +23,7 @@ import datetime
 import pytz
 import telegram
 from dotenv import load_dotenv
-from telegram import Update
+from telegram import Update, ParseMode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 # Enable logging
@@ -42,24 +41,24 @@ logger = logging.getLogger(__name__)
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     txt = get_moon_txt()
-    update.message.reply_text(txt)
+    update.message.reply_markdown_v2(txt)
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     txt = get_moon_txt()
-    update.message.reply_text(txt)
+    update.message.reply_markdown_v2(txt)
 
 
 def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
     txt = get_moon_txt()
-    update.message.reply_text(txt)
+    update.message.reply_markdown_v2(txt)
 
 
 def astropy_daily_report(context: telegram.ext.CallbackContext):
     txt = get_moon_txt()
-    context.bot.send_message(chat_id=os.getenv('GROUP_CHAT_ID'),
+    context.bot.send_message(chat_id=os.getenv('GROUP_CHAT_ID'), parse_mode=ParseMode.MARKDOWN_V2,
                              text=txt)
 
 
