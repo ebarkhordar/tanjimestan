@@ -32,14 +32,14 @@ def get_moon_txt():
     tropical_constellation_angle = int(angle % 30)
     tropical_constellation_txt = moon_name + list(constellation_names_dict.values())[
         tropical_constellation] + " " + str(
-        tropical_constellation_angle) + "درجه"
+        tropical_constellation_angle) + " درجه"
     tropical_symbol = list(constellation_symbol_dict.values())[tropical_constellation]
 
-    txt = "》بسم الله الرحمن الرحیم《\n\n"
+    txt = "*بسم الله الرحمن الرحیم*\n\n"
     JalaliDateTime.locale = "fa"
     jalali_date = JalaliDateTime.now().strftime("%Y / %m / %d")
     jalali_time = JalaliDateTime.now().strftime("%H:%M")
-    txt += "```\n" + jalali_date + "\n" + jalali_time + "\n\n" + "```"
+    txt += "```\n" + jalali_date + "\n" + jalali_time + "\n" + "```"
     txt += """
 ✅ برج فلکی 👈🏻            {tropical_symbol}
 {tropical}
@@ -47,10 +47,8 @@ def get_moon_txt():
 ✅ صورت فلکی 👈🏻        {sidereal_symbol}
 {sidereal}
 
-کانال ما:
-@tanjimestan
-ربات ما:
-@tanjimestan_bot
+[کانال ما](https://t.me/tanjimestan)
+[ربات ما](https://t.me/tanjimestan_bot)
 
 """.format(tropical_symbol=tropical_symbol, tropical=tropical_constellation_txt,
                        sidereal_symbol=sidereal_symbol, sidereal=sidereal_constellation_txt)
