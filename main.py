@@ -16,18 +16,19 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
+import datetime
 import logging
 import os
-import datetime
 
 import pytz
 import telegram
 from dotenv import load_dotenv
 from telegram import Update, ParseMode
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, CallbackContext
 
 # Enable logging
 from astronomy import get_moon_txt
+from constants import you_are_not_member_of_channel
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -40,20 +41,18 @@ logger = logging.getLogger(__name__)
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
-    txt = get_moon_txt()
-    update.message.reply_markdown_v2(txt)
+    user_id = update.effective_user.id
+    member_info = context.bot.get_chat_member(chat_id=os.getenv('GROUP_CHAT_ID'), user_id=user_id)
+    if member_info.status == 'left':
+        update.message.reply_text(you_are_not_member_of_channel)
+    else:
+        txt = get_moon_txt()
+        update.message.reply_markdown_v2(txt)
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
-    txt = get_moon_txt()
-    update.message.reply_markdown_v2(txt)
-
-
-def echo(update: Update, context: CallbackContext) -> None:
-    """Echo the user message."""
-    txt = get_moon_txt()
-    update.message.reply_markdown_v2(txt)
+    update.message.reply_text("برای شروع /start را بفرستید.")
 
 
 def astropy_daily_report(context: telegram.ext.CallbackContext):
@@ -79,7 +78,7 @@ def main():
     tehran_timezone = pytz.timezone("Asia/Tehran")
     job_minute = updater.job_queue.run_daily(astropy_daily_report, datetime.time(6, 0, 0, tzinfo=tehran_timezone))
     # on noncommand i.e message - echo the message on Telegram
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    # dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
     # Start the Bot
     updater.start_polling()
