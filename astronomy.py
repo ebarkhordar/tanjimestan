@@ -6,7 +6,7 @@ from astropy.time import Time
 from persiantools import digits
 from persiantools.jdatetime import JalaliDateTime
 
-from constants import constellation_names_dict, constellation_symbol_dict
+from constants import constellation_names_dict, tropical_index_names_dict
 
 
 def get_planet_position(body='moon', specific_datetime=None):
@@ -22,18 +22,26 @@ def get_planet_position(body='moon', specific_datetime=None):
         return angle, constellation
 
 
+def get_persian_name_of_constellation(constellation_en):
+    return constellation_names_dict.get(constellation_en)[0]
+
+
+def get_persian_symbol_of_constellation(constellation_en):
+    return constellation_names_dict.get(constellation_en)[1]
+
+
 def get_moon_txt():
     moon_name = "قمر در "
 
     angle, constellation = get_planet_position('moon')
-    sidereal_constellation_txt = moon_name + constellation_names_dict.get(constellation, constellation)
-    sidereal_symbol = constellation_symbol_dict.get(constellation, constellation)
-    tropical_constellation = int(angle / 30)
+    sidereal_constellation_txt = moon_name + get_persian_name_of_constellation(constellation)
+    sidereal_symbol = get_persian_symbol_of_constellation(constellation)
+    tropical_constellation_index = int(angle / 30)
     tropical_constellation_angle = int(angle % 30)
-    tropical_constellation_txt = moon_name + list(constellation_names_dict.values())[
-        tropical_constellation] + " " + str(
-        tropical_constellation_angle) + " درجه"
-    tropical_symbol = list(constellation_symbol_dict.values())[tropical_constellation]
+    tropical_name = list(tropical_index_names_dict.keys())[tropical_constellation_index]
+    tropical_constellation_txt = moon_name + get_persian_name_of_constellation(tropical_name) + \
+                                 " " + str(tropical_constellation_angle) + " درجه"
+    tropical_symbol = get_persian_symbol_of_constellation(tropical_name)
 
     txt = "*بسم الله الرحمن الرحیم*\n\n"
     JalaliDateTime.locale = "fa"
@@ -51,7 +59,7 @@ def get_moon_txt():
 [ربات ما](https://t.me/tanjimestan_bot)
 
 """.format(tropical_symbol=tropical_symbol, tropical=tropical_constellation_txt,
-                       sidereal_symbol=sidereal_symbol, sidereal=sidereal_constellation_txt)
+           sidereal_symbol=sidereal_symbol, sidereal=sidereal_constellation_txt)
 
     return digits.en_to_fa(txt)
     #
