@@ -57,7 +57,7 @@ constellation_names_dict = {
     "Musca": ("مگس", ""),
     "Norma": ("خط‌کش", ""),
     "Octans": ("هشتک", ""),
-    "Ophiuchus": ("مارافسای", ""),
+    "Ophiucus": ("مارافسای", ""),
     "Orion": ("جبّار", ""),
     "Pavo": ("طاووس", ""),
     "Pegasus": ("فرس اعظم", ""),
