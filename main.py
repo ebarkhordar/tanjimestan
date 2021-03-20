@@ -27,8 +27,8 @@ from telegram import Update, ParseMode
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
 # Enable logging
-from astronomy import get_moon_txt
-from constants import you_are_not_member_of_channel
+from logic.astronomy import get_moon_txt
+from logic.constants import you_are_not_member_of_channel
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
