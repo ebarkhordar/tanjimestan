@@ -6,7 +6,7 @@ from astropy.time import Time
 from persiantools import digits
 from persiantools.jdatetime import JalaliDateTime
 
-from constants import constellation_names_dict, tropical_index_names_dict
+from logic.constants import constellation_names_dict, tropical_index_names_dict
 
 
 def get_planet_position(body='moon', specific_datetime=None):
