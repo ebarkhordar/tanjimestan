@@ -22,8 +22,8 @@ from telegram.ext import (
 )
 
 # Enable logging
-from logic.astronomy import get_moon_txt
-from logic.constants import you_are_not_member_of_channel
+from logic.utils import get_moon_txt
+from logic.messages import Msg
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -36,22 +36,19 @@ CHOOSING, PHOTO, LOCATION, BIO = range(4)
 
 
 def start(update: Update, _: CallbackContext) -> int:
-    reply_keyboard = [['وضعیت فعلی قمر 🌜'], ['امکانات ویژه ⭐️']]
+    reply_keyboard = [[Msg.moon_status], [Msg.premium_features]]
     update.message.reply_text(
-        'سلام ☺️\n'
-        'یکی از گزینه‌های زیر رو انتخاب کن',
+        Msg.start,
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True),
     )
-
     return CHOOSING
 
 
-def gender(update: Update, _: CallbackContext) -> int:
+def premium_features(update: Update, _: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
     update.message.reply_text(
-        'I see! Please send me a photo of yourself, '
-        'so I know what you look like, or send /skip if you don\'t want to.',
+        Msg.premium_msg,
         reply_markup=ReplyKeyboardRemove(),
     )
 
@@ -128,7 +125,7 @@ def status(update: Update, context: CallbackContext) -> None:
         chat_id=os.getenv('GROUP_CHAT_ID'),
         user_id=user_id)
     if member_info.status == 'left':
-        update.message.reply_text(you_are_not_member_of_channel)
+        update.message.reply_text(Msg.you_are_not_member_of_channel)
     else:
         txt = get_moon_txt()
         update.message.reply_markdown_v2(txt)
@@ -159,7 +156,8 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            CHOOSING: [MessageHandler(Filters.regex('^(Boy|Girl|Other)$'), gender)],
+            CHOOSING: [MessageHandler(Filters.regex('^' + Msg.premium_features + '$'), premium_features),
+                       MessageHandler(Filters.regex('^' + Msg.moon_status + '$'), status)],
             PHOTO: [MessageHandler(Filters.photo, photo), CommandHandler('skip', skip_photo)],
             LOCATION: [
                 MessageHandler(Filters.location, location),
