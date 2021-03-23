@@ -3,10 +3,44 @@ from persiantools.jdatetime import JalaliDateTime
 
 from logic.astronomy import get_planet_position
 from logic.constellation_const import tropical_index_names_dict, constellation_names_dict
+from logic.messages import planets_fa_dict
 
 
 def planet_status():
-    pass
+    txt = "*بسم الله الرحمن الرحیم*\n\n"
+    JalaliDateTime.locale = "fa"
+    jalali_date = JalaliDateTime.now().strftime("%Y / %m / %d")
+    jalali_time = JalaliDateTime.now().strftime("%H:%M")
+    txt += "```\n" + jalali_date + "\n" + jalali_time + "\n" + "```"
+    for p in planets_fa_dict.keys():
+        angle, constellation = get_planet_position(p)
+        fa_name = planets_fa_dict.get(p)
+        fa_name += " در "
+        sidereal_constellation_txt = fa_name + get_persian_name_of_constellation(constellation)
+        sidereal_symbol = get_persian_symbol_of_constellation(constellation)
+        tropical_constellation_index = int(angle / 30)
+        tropical_constellation_angle = int(angle % 30)
+        tropical_name = list(tropical_index_names_dict.keys())[tropical_constellation_index]
+        tropical_constellation_txt = fa_name + get_persian_name_of_constellation(tropical_name) + \
+                                     " " + str(tropical_constellation_angle) + " درجه"
+        tropical_symbol = get_persian_symbol_of_constellation(tropical_name)
+        txt += """
+                   ✅ برج فلکی 👈🏻            {tropical_symbol}
+                   {tropical}
+
+                   ✅ صورت فلکی 👈🏻        {sidereal_symbol}
+                   {sidereal}
+
+
+                   """.format(tropical_symbol=tropical_symbol, tropical=tropical_constellation_txt,
+                              sidereal_symbol=sidereal_symbol, sidereal=sidereal_constellation_txt)
+
+    txt += """
+           [کانال ما](https://t.me/tanjimestan)
+           [ربات ما](https://t.me/tanjimestan_bot)
+           """
+
+    return digits.en_to_fa(txt)
 
 
 def get_moon_txt():
