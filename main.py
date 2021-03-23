@@ -23,7 +23,7 @@ from telegram.ext import (
 
 # Enable logging
 from logic.utils import get_moon_txt
-from logic.messages import Msg
+from logic.messages import Msg, Btn
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -36,10 +36,9 @@ CHOOSING, PHOTO, LOCATION, BIO = range(4)
 
 
 def start(update: Update, _: CallbackContext) -> int:
-    reply_keyboard = [[Msg.moon_status], [Msg.premium_features]]
+    reply_keyboard = [[Btn.moon_status], [Btn.planets_status]]
     update.message.reply_text(
-        Msg.start,
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True),
+        Msg.start, reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True),
     )
     return CHOOSING
 
@@ -118,8 +117,36 @@ def cancel(update: Update, _: CallbackContext) -> int:
     return ConversationHandler.END
 
 
-def status(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /status is issued."""
+def moon_status(update: Update, context: CallbackContext) -> None:
+    user_id = update.effective_user.id
+    member_info = context.bot.get_chat_member(
+        chat_id=os.getenv('GROUP_CHAT_ID'),
+        user_id=user_id)
+    if member_info.status == 'left':
+        update.message.reply_text(Msg.you_are_not_member_of_channel)
+    else:
+        txt = get_moon_txt()
+        update.message.reply_markdown_v2(txt)
+
+
+def is_member(func):
+    def wrapper_is_member(*args, **kwargs):
+        update = args[0]
+        context = args[1]
+        user_id = update.effective_user.id
+        member_info = context.bot.get_chat_member(
+            chat_id=os.getenv('GROUP_CHAT_ID'),
+            user_id=user_id)
+        if member_info.status == 'left':
+            update.message.reply_text(Msg.you_are_not_member_of_channel)
+        else:
+            func(*args, **kwargs)
+
+    return wrapper_is_member
+
+
+@is_member
+def planets_status(update: Update, context: CallbackContext) -> None:
     user_id = update.effective_user.id
     member_info = context.bot.get_chat_member(
         chat_id=os.getenv('GROUP_CHAT_ID'),
@@ -156,8 +183,9 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            CHOOSING: [MessageHandler(Filters.regex('^' + Msg.premium_features + '$'), premium_features),
-                       MessageHandler(Filters.regex('^' + Msg.moon_status + '$'), status)],
+            CHOOSING: [MessageHandler(Filters.regex('^' + Btn.premium_features + '$'), premium_features),
+                       MessageHandler(Filters.regex('^' + Btn.moon_status + '$'), moon_status),
+                       MessageHandler(Filters.regex('^' + Btn.planets_status + '$'), planets_status)],
             PHOTO: [MessageHandler(Filters.photo, photo), CommandHandler('skip', skip_photo)],
             LOCATION: [
                 MessageHandler(Filters.location, location),
@@ -171,7 +199,7 @@ def main():
     dispatcher.add_handler(conv_handler)
     # on different commands - answer in Telegram
 
-    dispatcher.add_handler(CommandHandler("status", status))
+    dispatcher.add_handler(CommandHandler("status", moon_status))
     dispatcher.add_handler(CommandHandler("help", help_command))
     tehran_timezone = pytz.timezone("Asia/Tehran")
     job_minute = updater.job_queue.run_daily(
