@@ -16,5 +16,3 @@ def get_planet_position(body='moon', specific_datetime=None):
         ra = sky_coord.ra
         angle = float(ra.to_string(decimal=True))
         return angle, constellation
-
-

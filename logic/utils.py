@@ -5,9 +5,12 @@ from logic.astronomy import get_planet_position
 from logic.constellation_const import tropical_index_names_dict, constellation_names_dict
 
 
+def planet_status():
+    pass
+
+
 def get_moon_txt():
     moon_name = "قمر در "
-
     angle, constellation = get_planet_position('moon')
     sidereal_constellation_txt = moon_name + get_persian_name_of_constellation(constellation)
     sidereal_symbol = get_persian_symbol_of_constellation(constellation)
