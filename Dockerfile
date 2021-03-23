@@ -1,4 +1,4 @@
-FROM python:3.9.0-slim
+FROM python:3.8.3-slim
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -15,8 +15,11 @@ WORKDIR /code
 
 # install dependencies
 RUN pip install --upgrade pip
-COPY requirements.txt /code/
-RUN pip install -r requirements.txt
+RUN pip install pipenv
+
+COPY Pipfile /code/
+COPY Pipfile.lock /code/
+RUN pipenv install --system --deploy
 
 COPY . .
 
