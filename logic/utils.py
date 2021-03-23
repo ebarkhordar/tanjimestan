@@ -6,14 +6,14 @@ from logic.constellation_const import tropical_index_names_dict, constellation_n
 from logic.messages import planets_fa_dict
 
 
-def planet_status():
+def planet_status(specific_datetime=None):
     txt = "*بسم الله الرحمن الرحیم*\n\n"
     JalaliDateTime.locale = "fa"
     jalali_date = JalaliDateTime.now().strftime("%Y / %m / %d")
     jalali_time = JalaliDateTime.now().strftime("%H:%M")
     txt += "```\n" + jalali_date + "\n" + jalali_time + "\n" + "```"
     for p in planets_fa_dict.keys():
-        angle, constellation = get_planet_position(p)
+        angle, constellation = get_planet_position(p, specific_datetime=specific_datetime)
         fa_name = planets_fa_dict.get(p)
         fa_name += " در "
         sidereal_constellation_txt = fa_name + get_persian_name_of_constellation(constellation)
