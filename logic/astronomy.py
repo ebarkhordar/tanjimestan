@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from astropy.coordinates import get_body, get_constellation
 from astropy.coordinates import solar_system_ephemeris
@@ -7,7 +7,7 @@ from astropy.time import Time
 
 def get_planet_position(body='moon', specific_datetime=None):
     if specific_datetime is None:
-        specific_datetime = datetime.now().strftime("%Y-%m-%d %H:%M")
+        specific_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         # today_date = datetime.now().strftime("2021-01-9 %H:%M")
     t = Time(specific_datetime)
     with solar_system_ephemeris.set('builtin'):

@@ -10,6 +10,8 @@ import os
 import pytz
 import telegram
 from dotenv import load_dotenv
+from persiantools import digits
+from persiantools.jdatetime import JalaliDateTime
 from telegram import (
     ParseMode,
     ReplyKeyboardMarkup,
@@ -38,7 +40,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-CHOOSING, PHOTO, LOCATION, BIO = range(4)
+CHOOSING, PHOTO, LOCATION, BIO, DATE, TIME = range(6)
 
 
 # check user is in channel or not?
@@ -65,7 +67,7 @@ def is_member(func):
 
 @is_member
 def start(update: Update, _: CallbackContext) -> int:
-    reply_keyboard = [[Btn.moon_status], [Btn.planets_status]]
+    reply_keyboard = [[Btn.moon_status], [Btn.planets_status], [Btn.custom_datetime]]
     update.message.reply_text(
         Msg.start, reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True),
     )
@@ -85,64 +87,67 @@ def premium_features(update: Update, _: CallbackContext) -> int:
 
 
 @is_member
-def photo(update: Update, _: CallbackContext) -> int:
-    user = update.message.from_user
-    photo_file = update.message.photo[-1].get_file()
-    photo_file.download('user_photo.jpg')
-    logger.info("Photo of %s: %s", user.first_name, 'user_photo.jpg')
+def moon_status(update: Update, context: CallbackContext) -> None:
+    txt = get_moon_txt()
+    update.message.reply_markdown_v2(txt)
+
+
+@is_member
+def planets_status(update: Update, context: CallbackContext) -> None:
+    txt = planet_status()
+    update.message.reply_markdown_v2(txt)
+
+
+@is_member
+def get_date(update: Update, _: CallbackContext) -> None:
     update.message.reply_text(
-        'Gorgeous! Now, send me your location please, or send /skip if you don\'t want to.'
+        Msg.request_date,
+        reply_markup=ReplyKeyboardRemove(),
     )
-
-    return LOCATION
+    return DATE
 
 
 @is_member
-def skip_photo(update: Update, _: CallbackContext) -> int:
-    user = update.message.from_user
-    logger.info("User %s did not send a photo.", user.first_name)
+def get_time(update: Update, context: CallbackContext) -> None:
+    date_text = update.effective_message.text
+    context.user_data['custom_date'] = date_text
     update.message.reply_text(
-        'I bet you look great! Now, send me your location please, or send /skip.'
+        Msg.request_time,
+        reply_markup=ReplyKeyboardRemove(),
     )
-
-    return LOCATION
+    return TIME
 
 
 @is_member
-def location(update: Update, _: CallbackContext) -> int:
-    user = update.message.from_user
-    user_location = update.message.location
-    logger.info(
-        "Location of %s: %f / %f", user.first_name, user_location.latitude, user_location.longitude
-    )
-    update.message.reply_text(
-        'Maybe I can visit you sometime! At last, tell me something about yourself.'
-    )
+def custom_datetime_planets_status(update: Update, context: CallbackContext) -> None:
+    try:
+        custom_time = update.effective_message.text
+        custom_date = context.user_data['custom_date']
+        custom_time = digits.fa_to_en(custom_time)
+        custom_date = digits.fa_to_en(custom_date)
 
-    return BIO
-
-
-@is_member
-def skip_location(update: Update, _: CallbackContext) -> int:
-    user = update.message.from_user
-    logger.info("User %s did not send a location.", user.first_name)
-    update.message.reply_text(
-        'You seem a bit paranoid! At last, tell me something about yourself.'
-    )
-
-    return BIO
-
-
-@is_member
-def bio(update: Update, _: CallbackContext) -> int:
-    user = update.message.from_user
-    logger.info("Bio of %s: %s", user.first_name, update.message.text)
-    update.message.reply_text('Thank you! I hope we can talk again some day.')
-
-    return ConversationHandler.END
+        custom_date_split = custom_date.split("/")
+        year = int(custom_date_split[0])
+        month = int(custom_date_split[1])
+        day = int(custom_date_split[2])
+        custom_time_split = custom_time.split(":")
+        hour = int(custom_time_split[0])
+        minute = int(custom_time_split[1])
+        specific_datetime = JalaliDateTime(
+            year, month, day,
+            hour, minute).to_gregorian().strftime("%Y-%m-%d %H:%M")
+        txt = planet_status(specific_datetime)
+        update.message.reply_markdown_v2(txt, reply_markup=ReplyKeyboardRemove())
+        return ConversationHandler.END
+    except Exception as e:
+        print(e)
+        update.message.reply_text(
+            Msg.invalid_datetime,
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        return get_date(update, context)
 
 
-@is_member
 def cancel(update: Update, _: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
@@ -150,20 +155,6 @@ def cancel(update: Update, _: CallbackContext) -> int:
         'Bye! I hope we can talk again some day.', reply_markup=ReplyKeyboardRemove()
     )
 
-    return ConversationHandler.END
-
-
-@is_member
-def moon_status(update: Update, context: CallbackContext) -> None:
-    txt = get_moon_txt()
-    update.message.reply_markdown_v2(txt)
-    return ConversationHandler.END
-
-
-@is_member
-def planets_status(update: Update, context: CallbackContext) -> None:
-    txt = planet_status()
-    update.message.reply_markdown_v2(txt)
     return ConversationHandler.END
 
 
@@ -192,14 +183,14 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            CHOOSING: [MessageHandler(Filters.regex('^' + Btn.moon_status + '$'), moon_status),
-                       MessageHandler(Filters.regex('^' + Btn.planets_status + '$'), planets_status)],
-            PHOTO: [MessageHandler(Filters.photo, photo), CommandHandler('skip', skip_photo)],
-            LOCATION: [
-                MessageHandler(Filters.location, location),
-                CommandHandler('skip', skip_location),
+            CHOOSING: [
+                MessageHandler(Filters.regex('^' + Btn.moon_status + '$'), moon_status),
+                MessageHandler(Filters.regex('^' + Btn.planets_status + '$'), planets_status),
+                MessageHandler(Filters.regex('^' + Btn.custom_datetime + '$'), get_date),
             ],
-            BIO: [MessageHandler(Filters.text & ~Filters.command, bio)],
+            DATE: [MessageHandler(Filters.text, get_time)],
+            TIME: [MessageHandler(Filters.text, custom_datetime_planets_status)],
+
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )
