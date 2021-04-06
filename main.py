@@ -35,7 +35,7 @@ from logic.messages import Msg, Btn, Url
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.DEBUG
+    level=os.getenv("LOGGING_LEVEL", logging.INFO)
 )
 
 logger = logging.getLogger(__name__)
