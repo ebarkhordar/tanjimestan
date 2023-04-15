@@ -18,7 +18,6 @@ RUN pip install --upgrade pip
 RUN pip install pipenv
 
 COPY Pipfile /code/
-COPY Pipfile.lock /code/
 RUN pipenv install --system --deploy
 
 COPY . .
