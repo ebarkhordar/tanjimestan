@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "tanjimestan"
+version = "0.1.0"
+description = ""
+authors = ["Ehsan Barkhordar <barkhordar.me@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+astropy = "==4.2"
+persiantools = "==1.5.1"
+python-dotenv = "==0.15.0"
+python-telegram-bot = "==13.1"
+pytz = "==2020.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
