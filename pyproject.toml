@@ -10,7 +10,7 @@ python = "^3.10"
 astropy = "==5.2.2"
 persiantools = "==3.0.1"
 python-dotenv = "==1.0.0"
-python-telegram-bot = "==20.2"
+python-telegram-bot = "==13.1"
 pytz = "==2023.3"
 
 
